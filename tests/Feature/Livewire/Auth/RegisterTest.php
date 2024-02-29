@@ -14,7 +14,8 @@ it('should be able to register a new user in the system and logged user', functi
     Livewire::test(Register::class)->set('name', 'Joe doe')->set('email', 'joe@doe.com')->set(
         'email_confirmation',
         'joe@doe.com'
-    )->set('password', 'password')->call('submit')->assertHasNoErrors();
+    )->set('password', 'password')->call('submit')->assertHasNoErrors()
+    ->assertRedirect(\App\Providers\RouteServiceProvider::HOME);
 
     assertDatabaseHas('users', [
         'name'  => 'Joe doe',
