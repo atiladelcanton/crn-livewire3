@@ -8,6 +8,9 @@ export default {
 		 "./resources/**/*.vue",
 		 "./vendor/robsontenorio/mary/src/View/Components/**/*.php"
 	],
+	daisyui: {
+		themes: ["light", "dark", "cupcake"],
+	},
   theme: {
     extend: {},
   },
