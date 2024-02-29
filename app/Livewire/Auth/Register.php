@@ -19,20 +19,20 @@ class Register extends Component
 
     #[Rule(['required'])]
     public ?string $password = null;
+
     public function render()
     {
-        return view('livewire.auth.register');
+        return view('livewire.auth.register')->layout('components.layouts.guest');
     }
 
     public function submit(): void
     {
         $this->validate();
-        $user = User::query()
-            ->create([
-                'name'     => $this->name,
-                'email'    => $this->email,
-                'password' => $this->password,
-            ]);
+        $user = User::query()->create([
+            'name'     => $this->name,
+            'email'    => $this->email,
+            'password' => $this->password,
+        ]);
         auth()->login($user);
 
         $this->redirect(RouteServiceProvider::HOME);

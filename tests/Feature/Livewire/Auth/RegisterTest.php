@@ -39,5 +39,4 @@ test('validation rules', function ($f) {
     'email::max:255'     => (object)['field' => 'email', 'value' => str_repeat('*@doe.com', 256), 'rule' => 'max'],
     'email::confirmed'   => (object)['field' => 'email', 'value' => 'joe@doe.com.br', 'rule' => 'confirmed'],
     'password::required' => (object)['field' => 'password', 'value' => '', 'rule' => 'required'],
-
 ]);
