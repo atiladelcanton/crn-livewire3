@@ -6,7 +6,7 @@ use App\Models\User;
 use function Pest\Laravel\{assertDatabaseCount, assertDatabaseHas, get};
 
 test('needs to have a route to password recovery', function () {
-    get(route('auth.password.recovery'))->assertOk();
+    get(route('password.recovery'))->assertOk();
 });
 
 it('should be able to request for password recovery sending notification to the user', function () {
