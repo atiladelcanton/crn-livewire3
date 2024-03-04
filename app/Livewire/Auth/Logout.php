@@ -6,9 +6,12 @@ use Livewire\Component;
 
 class Logout extends Component
 {
-    public function render(): \Illuminate\Contracts\View\View|\Illuminate\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\View\View|\Illuminate\Contracts\Foundation\Application
+    public function render(): string
     {
-        return view('livewire.auth.logout');
+        return <<<BLADE
+            <x-button icon="o-power" class="btn-circle btn-ghost btn-xs" tooltip-left="logoff" wire:click="logout" />
+        BLADE;
+
     }
     public function logout(): void
     {
