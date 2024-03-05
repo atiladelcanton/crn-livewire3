@@ -1,6 +1,6 @@
 <?php
 
-use App\Livewire\Auth\Livewire\Recovery;
+use App\Livewire\Auth\Recovery;
 use App\Models\User;
 
 use function Pest\Laravel\{assertDatabaseCount, assertDatabaseHas, get};
