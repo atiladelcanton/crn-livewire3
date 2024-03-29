@@ -37,7 +37,13 @@
             @if($user = auth()->user())
                 <x-list-item :item="$user" value="name" sub-value="email" no-separator no-hover class="mb-5 -mx-2 rounded">
                     <x-slot:actions>
-                        <livewire:auth.logout/>
+                         <div class="tooltip tooltip-left" data-tip="logoff">
+                            <x-button
+                                icon="o-power"
+                                class="btn-circle btn-ghost btn-xs"
+                                @click="$dispatch('logout')"
+                            />
+                        </div>
                     </x-slot:actions>
                 </x-list-item>
             @endif
@@ -56,6 +62,7 @@
     </x-slot:content>
 </x-main>
 
+<livewire:auth.logout/>
 {{--  TOAST area --}}
 <x-toast />
 </body>
