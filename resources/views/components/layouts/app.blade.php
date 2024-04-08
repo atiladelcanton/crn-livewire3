@@ -34,10 +34,14 @@
         <x-menu activate-by-route>
 
             {{-- User --}}
+
             @if($user = auth()->user())
-                <x-list-item :item="$user" value="name" sub-value="email" no-separator no-hover class="mb-5 -mx-2 rounded">
+                <x-list-item :item="$user" sub-value="username" no-separator no-hover
+                             class="!-mx-2 mt-2 mb-5">
                     <x-slot:actions>
-                        <livewire:auth.logout/>
+                        <div class="tooltip tooltip-left" data-tip="logoff">
+                            <livewire:auth.logout/>
+                        </div>
                     </x-slot:actions>
                 </x-list-item>
             @endif
