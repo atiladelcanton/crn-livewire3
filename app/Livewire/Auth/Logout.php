@@ -12,15 +12,18 @@ class Logout extends Component
         return <<<BLADE
             <div></div>
         BLADE;
-
     }
 
+
     #[On('logout')]
+
     public function logout(): void
     {
         auth()->logout();
+
         session()->invalidate();
         session()->regenerateToken();
+
         $this->redirect(route('login'));
     }
 }
