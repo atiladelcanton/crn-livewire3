@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\{User};
+use App\Models\{Can, User};
 use Illuminate\Database\Seeder;
 
 class UserSeeder extends Seeder
@@ -11,7 +11,7 @@ class UserSeeder extends Seeder
     {
         User::factory()
             ->afterCreating(function (User $user) {
-                $user->givePermissionTo('be an admin');
+                $user->givePermissionTo(Can::BE_AN_ADMIN);
             })
             ->create([
                 'name'  => 'Admin do CRM',

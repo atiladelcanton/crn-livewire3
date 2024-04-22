@@ -8,29 +8,31 @@ use Illuminate\Support\Facades\Cache;
 
 trait HasPermissions
 {
-    public function permissions(): BelongsToMany
+    public function givePermissionTo(Can|string $key): void
     {
-        return $this->belongsToMany(Permission::class);
-    }
-    public function givePermissionTo(string $key): void
-    {
-        $this->permissions()->firstOrCreate(compact('key'));
+        $pkey = $key instanceof Can ? $key->value : $key;
+        $this->permissions()->firstOrCreate(['key' => $pkey]);
         Cache::forget($this->permissionCacheKey());
         Cache::rememberForever($this->permissionCacheKey(), fn () => $this->permissions);
     }
 
-    public function hasPermissionTo(string $key): bool
+    public function permissions(): BelongsToMany
     {
-        /** @var Collection $permissions */
-        $permissions = Cache::get($this->permissionCacheKey(), $this->permissions);
-
-        return $permissions
-            ->where('key', $key)
-            ->isNotEmpty();
+        return $this->belongsToMany(Permission::class);
     }
 
     private function permissionCacheKey(): string
     {
         return "user::{{$this->id}}::permissions";
+    }
+
+    public function hasPermissionTo(Can|string $key): bool
+    {
+        $pkey = $key instanceof Can ? $key->value : $key;
+
+        /** @var Collection $permissions */
+        $permissions = Cache::get($this->permissionCacheKey(), $this->permissions);
+
+        return $permissions->where('key', '=', $pkey)->isNotEmpty();
     }
 }
