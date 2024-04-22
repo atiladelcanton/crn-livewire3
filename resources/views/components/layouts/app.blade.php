@@ -55,6 +55,11 @@
                 <x-menu-item title="Wifi" icon="o-wifi" link="####" />
                 <x-menu-item title="Archives" icon="o-archive-box" link="####" />
             </x-menu-sub>
+            @can(\App\Enum\Can::BE_AN_ADMIN->value)
+                <x-menu-sub title="Admin" icon="o-lock-closed">
+                    <x-menu-item title="Dashboard" icon="o-chart-bar-square" :link="route('admin.dashboard')" />
+                </x-menu-sub>
+            @endcan
         </x-menu>
     </x-slot:sidebar>
 
