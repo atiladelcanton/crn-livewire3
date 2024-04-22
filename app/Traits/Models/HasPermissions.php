@@ -1,7 +1,9 @@
 <?php
 
-namespace App\Models;
+namespace App\Traits\Models;
 
+use App\Enum\Can;
+use App\Models\Permission;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Facades\Cache;

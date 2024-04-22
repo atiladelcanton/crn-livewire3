@@ -2,7 +2,8 @@
 
 namespace Database\Seeders;
 
-use App\Models\{Can, Permission};
+use App\Enum\Can;
+use App\Models\{Permission};
 use Illuminate\Database\Seeder;
 
 class PermissionSeeder extends Seeder
