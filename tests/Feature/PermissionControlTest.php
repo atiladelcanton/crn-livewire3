@@ -3,7 +3,7 @@
 use App\Models\{Permission, User};
 use Database\Seeders\{PermissionSeeder, UserSeeder, UsersSeeder};
 
-use function Pest\Laravel\assertDatabaseHas;
+use function Pest\Laravel\{assertDatabaseHas, get};
 
 it('should be able to gin an user a permission to do something', function () {
     /** @var User $user */
@@ -40,4 +40,12 @@ test('seed with an admin', function () {
         'user_id'       => User::first()?->id,
         'permission_id' => Permission::where('key', '=', 'be an admin')->first()?->id,
     ]);
+});
+
+it('should block the acces to an admin page if the user does not have the permission to be an admin', function () {
+    $user = User::factory()->create();
+
+    \Pest\Laravel\actingAs($user);
+    get(route('admin.dashboard'))
+        ->assertForbidden();
 });

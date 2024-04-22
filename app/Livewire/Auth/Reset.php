@@ -25,6 +25,7 @@ class Reset extends Component
 
     public function mount(?string $token = null, ?string $email = null): void
     {
+
         $this->token = request('token', $token);
         $this->email = request('email', $email);
 

@@ -71,7 +71,7 @@ services:
         volumes:
             - ./data:/data
         ports:
-            - 8025:8025
+            - 8026:8025
             - 1025:1025
         networks:
             - sail
