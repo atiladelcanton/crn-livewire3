@@ -1,5 +1,6 @@
 <?php
 
+use App\Enum\Can;
 use App\Livewire\Admin;
 use App\Models\{Permission, User};
 
@@ -72,9 +73,11 @@ it('should be able to filter by name and email', function () {
 });
 
 it('should be able to filter by permission.key', function () {
-    $admin      = User::factory()->admin()->create(['name' => 'Joe Doe', 'email' => 'admin@gmail.com']);
-    $nonAdmin   = User::factory()->create(['name' => 'Mario', 'email' => 'little_guy@email.com']);
-    $permission = Permission::where('key', '=', \App\Enum\Can::BE_AN_ADMIN->value)->first();
+    $admin       = User::factory()->admin()->create(['name' => 'Joe Doe', 'email' => 'admin@gmail.com']);
+    $nonAdmin    = User::factory()->afterCreating(fn (User $user) => $user->givePermissionTo(Can::TESTING))->create(['name' => 'Mario', 'email' => 'little_guy@email.com']);
+    $permissions = Permission::whereIn('key', [\App\Enum\Can::BE_AN_ADMIN->value, \App\Enum\Can::TESTING->value])
+        ->pluck('id')->toArray();
+
     actingAs($admin);
 
     Livewire::test(Admin\Users\Index::class)->assertSet('users', function ($users) {
@@ -82,10 +85,10 @@ it('should be able to filter by permission.key', function () {
 
         return true;
     })
-        ->set('search_permissions', [$permission->id])
+        ->set('search_permissions', $permissions)
         ->assertSet('users', function ($users) {
             expect($users)
-                ->toHaveCount(1)
+                ->toHaveCount(2)
                 ->first()->name->toBe('Joe Doe');
 
             return true;

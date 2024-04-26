@@ -50,15 +50,9 @@ class Index extends Component
             )
             ->when(
                 $this->search_permissions,
-                fn (Builder $q) => $q->whereRaw(
-                    '(
-                                select count(*) 
-                                from permission_user 
-                                where permission_id in (?) 
-                                and user_id = users.id
-                            ) > 0',
-                    $this->search_permissions
-                )
+                fn (Builder $q) => $q->whereHas('permissions', function (Builder $q) {
+                    $q->whereIn('id', $this->search_permissions);
+                })
             )
             ->paginate();
     }
