@@ -10,6 +10,7 @@ class UserSeeder extends Seeder
 {
     public function run(): void
     {
+
         User::factory()
             ->afterCreating(function (User $user) {
                 $user->givePermissionTo(Can::BE_AN_ADMIN);
@@ -18,5 +19,6 @@ class UserSeeder extends Seeder
                 'name'  => 'Admin do CRM',
                 'email' => 'admin@crm.com',
             ]);
+        User::factory()->count(60)->create();
     }
 }

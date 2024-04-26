@@ -4,7 +4,9 @@ namespace App\Livewire\Admin\Users;
 
 use App\Enum\Can;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 
@@ -14,6 +16,9 @@ use Livewire\Component;
  */
 class Index extends Component
 {
+    public ?string $search = null;
+
+    public array $search_permissions = [];
     public function mount()
     {
         $this->authorize(Can::BE_AN_ADMIN->value);
@@ -27,7 +32,35 @@ class Index extends Component
     #[Computed]
     public function users(): LengthAwarePaginator
     {
-        return User::paginate();
+        $this->validate(['search_permissions' => 'exists:permissions,id']);
+
+        return User::query()
+            ->when(
+                $this->search,
+                fn (Builder $q) => $q->where(
+                    DB::raw('lower(name)'),
+                    'like',
+                    "%{$this->search}%"
+                )
+                    ->orWhere(
+                        'email',
+                        'like',
+                        "%{$this->search}%"
+                    )
+            )
+            ->when(
+                $this->search_permissions,
+                fn (Builder $q) => $q->whereRaw(
+                    '(
+                                select count(*) 
+                                from permission_user 
+                                where permission_id in (?) 
+                                and user_id = users.id
+                            ) > 0',
+                    $this->search_permissions
+                )
+            )
+            ->paginate();
     }
     #[Computed]
     public function headers(): array
