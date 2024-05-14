@@ -3,8 +3,8 @@
 namespace App\Livewire\Admin\Users;
 
 use App\Enum\Can;
-use App\Models\User;
-use Illuminate\Database\Eloquent\Builder;
+use App\Models\{Permission, User};
+use Illuminate\Database\Eloquent\{Builder, Collection};
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Computed;
@@ -19,9 +19,14 @@ class Index extends Component
     public ?string $search = null;
 
     public array $search_permissions = [];
+
+    public Collection $permissionsToSearch;
+
+    public bool $search_trash = false;
     public function mount()
     {
         $this->authorize(Can::BE_AN_ADMIN->value);
+        $this->filterPermissions();
     }
 
     public function render()
@@ -37,16 +42,8 @@ class Index extends Component
         return User::query()
             ->when(
                 $this->search,
-                fn (Builder $q) => $q->where(
-                    DB::raw('lower(name)'),
-                    'like',
-                    "%{$this->search}%"
-                )
-                    ->orWhere(
-                        'email',
-                        'like',
-                        "%{$this->search}%"
-                    )
+                fn (Builder $q) => $q->where(DB::raw('lower(name)'), 'like', "%{$this->search}%")
+                    ->orWhere('email', 'like', "%{$this->search}%")
             )
             ->when(
                 $this->search_permissions,
@@ -54,8 +51,10 @@ class Index extends Component
                     $q->whereIn('id', $this->search_permissions);
                 })
             )
+            ->when($this->search_trash, fn (Builder $q) => $q->onlyTrashed())
             ->paginate();
     }
+
     #[Computed]
     public function headers(): array
     {
@@ -65,5 +64,15 @@ class Index extends Component
             ['key' => 'email', 'label' => 'Email'],
             ['key' => 'permissions', 'label' => 'Permissions'],
         ];
+    }
+
+    public function filterPermissions(?string $search = null): void
+    {
+        $this->permissionsToSearch = Permission::query()
+            ->when($search, function (Builder $q) use ($search) {
+                $q->where('key', 'like', "%{$search}%");
+            })
+            ->orderBy('key')
+            ->get();
     }
 }
