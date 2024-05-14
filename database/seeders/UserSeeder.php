@@ -20,5 +20,6 @@ class UserSeeder extends Seeder
                 'email' => 'admin@crm.com',
             ]);
         User::factory()->count(60)->create();
+        User::factory()->count(10)->deleted()->create();
     }
 }

@@ -18,6 +18,7 @@
                 no-result-text="Nothing here"
                 label="Search by permissions"
         />
+        <x-checkbox label="Show Deleted Users" wire:model.live="search_trash" class="checkbox-primary" right tight />
 
     </div>
     <x-card>
@@ -27,8 +28,16 @@
                     <x-badge :value="$permission->key" class="badge-primary" />
                 @endforeach
             @endscope
+
             @scope('actions', $user)
-                <x-button icon="o-trash" wire:click="delete({{ $user->id }})" spinner class="btn-sm" />
+                @unless($user->trashed())
+                    <x-button icon="o-trash" wire:click="delete({{ $user->id }})" spinner class="btn-sm btn-error
+                    btn-outline" />
+                @else
+                <x-button icon="o-arrow-path-rounded-square" wire:click="restore({{ $user->id }})" spinner
+                          class="btn-sm btn-success
+                btn-outline" />
+                @endunless
             @endscope
         </x-table>
     </x-card>
