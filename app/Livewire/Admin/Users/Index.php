@@ -22,6 +22,10 @@ class Index extends Component
 
     public Collection $permissionsToSearch;
 
+    public string $sortDirection = 'asc';
+
+    public string $sortColumnBy = 'id';
+
     public bool $search_trash = false;
     public function mount()
     {
@@ -52,6 +56,7 @@ class Index extends Component
                 })
             )
             ->when($this->search_trash, fn (Builder $q) => $q->onlyTrashed())
+            ->orderBy($this->sortColumnBy, $this->sortDirection)
             ->paginate();
     }
 
