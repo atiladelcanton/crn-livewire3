@@ -27,10 +27,18 @@ class Index extends Component
     public string $sortColumnBy = 'id';
 
     public bool $search_trash = false;
+
     public function mount()
     {
         $this->authorize(Can::BE_AN_ADMIN->value);
         $this->filterPermissions();
+    }
+
+    public function filterPermissions(?string $search = null): void
+    {
+        $this->permissionsToSearch = Permission::query()->when($search, function (Builder $q) use ($search) {
+            $q->where('key', 'like', "%{$search}%");
+        })->orderBy('key')->get();
     }
 
     public function render()
@@ -43,41 +51,58 @@ class Index extends Component
     {
         $this->validate(['search_permissions' => 'exists:permissions,id']);
 
-        return User::query()
-            ->when(
-                $this->search,
-                fn (Builder $q) => $q->where(DB::raw('lower(name)'), 'like', "%{$this->search}%")
-                    ->orWhere('email', 'like', "%{$this->search}%")
+        return User::query()->when(
+            $this->search,
+            fn (Builder $q) => $q->where(DB::raw('lower(name)'), 'like', "%{$this->search}%")->orWhere(
+                'email',
+                'like',
+                "%{$this->search}%"
             )
-            ->when(
-                $this->search_permissions,
-                fn (Builder $q) => $q->whereHas('permissions', function (Builder $q) {
-                    $q->whereIn('id', $this->search_permissions);
-                })
-            )
-            ->when($this->search_trash, fn (Builder $q) => $q->onlyTrashed())
-            ->orderBy($this->sortColumnBy, $this->sortDirection)
-            ->paginate();
+        )->when(
+            $this->search_permissions,
+            fn (Builder $q) => $q->whereHas('permissions', function (Builder $q) {
+                $q->whereIn('id', $this->search_permissions);
+            })
+        )->when($this->search_trash, fn (Builder $q) => $q->onlyTrashed())->orderBy(
+            $this->sortColumnBy,
+            $this->sortDirection
+        )->paginate();
     }
 
     #[Computed]
     public function headers(): array
     {
         return [
-            ['key' => 'id', 'label' => '#'],
-            ['key' => 'name', 'label' => 'Name'],
-            ['key' => 'email', 'label' => 'Email'],
-            ['key' => 'permissions', 'label' => 'Permissions'],
+            [
+                'key'           => 'id',
+                'label'         => '#',
+                'sortColumnBy'  => $this->sortColumnBy,
+                'sortDirection' => $this->sortDirection,
+            ],
+            [
+                'key'           => 'name',
+                'label'         => 'Name',
+                'sortColumnBy'  => $this->sortColumnBy,
+                'sortDirection' => $this->sortDirection,
+            ],
+            [
+                'key'           => 'email',
+                'label'         => 'Email',
+                'sortColumnBy'  => $this->sortColumnBy,
+                'sortDirection' => $this->sortDirection,
+            ],
+            [
+                'key'           => 'permissions',
+                'label'         => 'Permissions',
+                'sortColumnBy'  => $this->sortColumnBy,
+                'sortDirection' => $this->sortDirection,
+            ],
         ];
     }
 
-    public function filterPermissions(?string $search = null): void
+    public function sortBy(string $column, string $direction): void
     {
-        $this->permissionsToSearch = Permission::query()
-            ->when($search, function (Builder $q) use ($search) {
-                $q->where('key', 'like', "%{$search}%");
-            })
-            ->orderBy('key')
-            ->get();
+        $this->sortColumnBy  = $column;
+        $this->sortDirection = $direction;
     }
 }
